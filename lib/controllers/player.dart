@@ -53,42 +53,46 @@ class CustomAudioPlayer extends BackgroundAudioTask {
       album: 'ABC Radio',
       title: 'A rádio que não cansa vc');
 
-  Future<void> onStart() async {
-    AudioServiceBackground.setMediaItem(mediaItem);
-    audioStart();
-    onPlay();
+  @override
+  Future onStart() async {
+    await AudioServiceBackground.setMediaItem(mediaItem);
+    await audioStart();
+    await onPlay();
     await _completer.future;
   }
 
-  Future<void> audioStart() async {
+  Future audioStart() async {
     await FlutterRadio.audioStart();
   }
 
-  void playPause() {
+  Future playPause() async {
     if (_playing)
-      onPause();
+      await onPause();
     else
-      onPlay();
+      await onPlay();
   }
 
-  void onPlay() {
-    FlutterRadio.play(url: streamUrl);
+  @override
+  Future onPlay() async {
+    await FlutterRadio.play(url: streamUrl);
     _playing = true;
-    AudioServiceBackground.setState(
+    await AudioServiceBackground.setState(
         controls: [pauseControl, stopControl],
         basicState: BasicPlaybackState.playing);
   }
 
-  void onPause() {
-    FlutterRadio.playOrPause(url: streamUrl);
-    AudioServiceBackground.setState(
+  @override
+  Future onPause() async {
+    await FlutterRadio.playOrPause(url: streamUrl);
+    await AudioServiceBackground.setState(
         controls: [playControl, stopControl],
         basicState: BasicPlaybackState.paused);
   }
 
-  void onStop() {
-    FlutterRadio.stop();
-    AudioServiceBackground.setState(
+  @override
+  Future onStop() async {
+    await FlutterRadio.stop();
+    await AudioServiceBackground.setState(
         controls: [], basicState: BasicPlaybackState.stopped);
     _completer.complete();
   }

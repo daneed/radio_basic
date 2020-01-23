@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:abcradio/pages/contato.dart';
 import 'package:abcradio/pages/home_page.dart';
 import 'package:abcradio/pages/pedido_musica.dart';
@@ -70,18 +72,28 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   Player player = Player();
   PlaybackState state;
 
-  bool buttonState = true;
+  bool buttonStateIsPlaying;
   Color mainColor = Color(0xFF1B203C);
   PageController _myPage = PageController(initialPage: 0);
 
-  void buttonChange() {
+  bool buttonChangeAllowed = true;
+  Future buttonChange() async {
+    if (!buttonChangeAllowed) {
+      return Future; 
+    }
+    print("buttonChange() happening");
+    buttonChangeAllowed = false;
     if (state?.basicState == BasicPlaybackState.playing) {
       _animationController.forward();
-      AudioService.pause();
+      await AudioService.pause();
     } else {
       _animationController.reverse();
-      AudioService.play();
+      await AudioService.play();
     }
+    Timer(Duration(milliseconds: 1000), () {
+      print("Yeah, this line is printed after 1000 milliseconds");
+      buttonChangeAllowed = true;
+    });
   }
 
   Widget build(BuildContext context) {
@@ -178,10 +190,18 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   }
 
   Widget buildPlayer(PlaybackState state) {
-    if (state?.basicState == BasicPlaybackState.playing) {
-      _animationController.reverse();
+    if (buttonStateIsPlaying != null && buttonStateIsPlaying == (state?.basicState == BasicPlaybackState.playing)) {
+      print("state is not changed, no change needed.");
     } else {
-      _animationController.forward();
+      if (state?.basicState == BasicPlaybackState.playing) {
+        buttonStateIsPlaying = true;
+        _animationController.reverse();
+        print("state is playing.");
+      } else {
+        buttonStateIsPlaying = false;
+        _animationController.forward();
+        print("state is paused.");
+      }
     }
     return FloatingActionButton(
       backgroundColor: mainColor,
