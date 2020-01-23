@@ -48,8 +48,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
     _animateIcon =
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
     _animateColor = ColorTween(
-      begin: Color(0xFF1B203C),
-      end: Color(0xFF1B203C),
+      //begin: Color(0xFF1B203C),
+       begin: Colors.grey,
+      end: Color(0xFFF8665E),
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Interval(
@@ -191,11 +192,11 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
           decoration: BoxDecoration(
               shape: BoxShape.circle,
               border:
-              Border.all(color: Color(0xFFF8665E), width: 3.2)),
+              Border.all(color: _animateColor.value, width: 3.2)),
           child: AnimatedIcon(
             icon: AnimatedIcons.pause_play,
             progress: _animateIcon,
-            color: Color(0xFFF8665E),
+            color: _animateColor.value,
             size: 35,
           )),
     );
