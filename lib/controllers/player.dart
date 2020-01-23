@@ -3,7 +3,7 @@ import 'package:flutter_radio/flutter_radio.dart';
 import 'dart:async';
 
 const streamUrl =
-    'http://stm16.abcaudio.tv:25584/player.mp3';
+    'http://88.198.10.229:8056';
 
 bool buttonState = true;
 
