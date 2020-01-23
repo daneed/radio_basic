@@ -22,12 +22,18 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  audio_service: ^0.5.7
-  flutter_radio: ^0.1.7
+  #audio_service: ^0.5.7
+  #flutter_radio: ^0.1.7
   webview_flutter: ^0.3.18
   share: ^0.6.3+5
   http: ^0.12.0+4
   cron: ^0.2.2
+
+  flutter_radio: 
+    path: ../flutter_radio
+
+  audio_service:
+    path: ../audio_service
 
 
 dev_dependencies:
