@@ -25,7 +25,7 @@ packages:
   audio_service:
     dependency: "direct main"
     description:
-      path: "../audio_service"
+      path: "..\\audio_service"
       relative: true
     source: path
     version: "0.5.7"
@@ -86,7 +86,7 @@ packages:
   flutter_radio:
     dependency: "direct main"
     description:
-      path: "../flutter_radio"
+      path: "..\\flutter_radio"
       relative: true
     source: path
     version: "0.1.7"
