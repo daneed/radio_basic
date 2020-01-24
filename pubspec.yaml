@@ -28,6 +28,7 @@ dependencies:
   share: ^0.6.3+5
   http: ^0.12.0+4
   cron: ^0.2.2
+  loading: ^1.0.2
 
   flutter_radio: 
     path: ../flutter_radio

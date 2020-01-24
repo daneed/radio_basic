@@ -8,7 +8,24 @@ import 'package:abcradio/controllers/player.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:share/share.dart';
 
+import 'package:loading/loading.dart';
+import 'package:loading/indicator/ball_spin_fade_loader_indicator.dart';
+
 void main() => runApp(MyApp());
+
+class Delayer {
+  ValueNotifier<bool> _shouldWaitVn = ValueNotifier<bool>(false);
+  ValueNotifier<bool> get shouldWaitVn => _shouldWaitVn;
+  bool  get shouldWait => _shouldWaitVn.value;
+
+  void set() {
+    _shouldWaitVn.value = true;
+    Timer.periodic(Duration(milliseconds: 1000), (t) {
+      _shouldWaitVn.value = false;
+      t.cancel();
+    });
+  }
+}
 
 class MyApp extends StatelessWidget {
   static const String _title = 'ABC Radio Light';
@@ -23,7 +40,70 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class FloatinActionButtonWidget extends StatefulWidget {
+  final Delayer delayer;
+  final Color mainColor;
+  final Animation<Color> animateColor;
+  final Animation<double> animateIcon;
+  final Function buttonChangeFn;
+
+  FloatinActionButtonWidget(this.delayer, this.mainColor, this.animateColor, this.animateIcon, this.buttonChangeFn);
+
+  @override
+  _FloatinActionButtonWidgetState createState() => _FloatinActionButtonWidgetState();
+}
+
+class _FloatinActionButtonWidgetState extends State<FloatinActionButtonWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([widget.delayer._shouldWaitVn]),
+      builder: (context, _) {
+        return _buildContent();
+      }
+    );
+
+  }
+
+   Widget _buildContent() {
+    if (widget.delayer.shouldWait) {
+      return FloatingActionButton(
+        backgroundColor: widget.mainColor,
+        onPressed: widget.buttonChangeFn,
+        child: Container(
+            width: 120,
+            margin: EdgeInsets.all(7.5),
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border:
+                Border.all(color: Colors.grey, width: 3.2)),
+            child: Loading(indicator: BallSpinFadeLoaderIndicator(), size: 35.0, color: Colors.grey)
+        )
+      );
+     } else {
+        return FloatingActionButton(
+          backgroundColor: widget.mainColor,
+          onPressed: widget.buttonChangeFn,
+          child: Container(
+              width: 120,
+              margin: EdgeInsets.all(7.5),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border:
+                  Border.all(color: widget.animateColor.value, width: 3.2)),
+              child: AnimatedIcon(
+                icon: AnimatedIcons.pause_play,
+                progress: widget.animateIcon,
+                color: widget.animateColor.value,
+                size: 35,
+              )),
+          );
+     }
+   }
+}
+
 class MyStatefulWidget extends StatefulWidget {
+  final Delayer delayer = Delayer();
   MyStatefulWidget({Key key}) : super(key: key);
 
   @override
@@ -76,13 +156,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   Color mainColor = Color(0xFF1B203C);
   PageController _myPage = PageController(initialPage: 0);
 
-  bool buttonChangeAllowed = true;
   Future buttonChange() async {
-    if (!buttonChangeAllowed) {
+    if (widget.delayer.shouldWait) {
       return Future; 
     }
     print("buttonChange() happening");
-    buttonChangeAllowed = false;
+    
     if (state?.basicState == BasicPlaybackState.playing) {
       _animationController.forward();
       await AudioService.pause();
@@ -90,10 +169,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
       _animationController.reverse();
       await AudioService.play();
     }
-    Timer(Duration(milliseconds: 1000), () {
-      print("Yeah, this line is printed after 1000 milliseconds");
-      buttonChangeAllowed = true;
-    });
+    widget.delayer.set();
   }
 
   Widget build(BuildContext context) {
@@ -182,43 +258,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
                 height: 120,
                 width: 120,
                 child: FittedBox(
-                  child: buildPlayer(state),
+                  child: FloatinActionButtonWidget(widget.delayer, mainColor, _animateColor, _animateIcon, buttonChange)
                 ));
           }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
-  }
-
-  Widget buildPlayer(PlaybackState state) {
-    if (buttonStateIsPlaying != null && buttonStateIsPlaying == (state?.basicState == BasicPlaybackState.playing)) {
-      print("state is not changed, no change needed.");
-    } else {
-      if (state?.basicState == BasicPlaybackState.playing) {
-        buttonStateIsPlaying = true;
-        _animationController.reverse();
-        print("state is playing.");
-      } else {
-        buttonStateIsPlaying = false;
-        _animationController.forward();
-        print("state is paused.");
-      }
-    }
-    return FloatingActionButton(
-      backgroundColor: mainColor,
-      onPressed: buttonChange,
-      child: Container(
-          width: 120,
-          margin: EdgeInsets.all(7.5),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border:
-              Border.all(color: _animateColor.value, width: 3.2)),
-          child: AnimatedIcon(
-            icon: AnimatedIcons.pause_play,
-            progress: _animateIcon,
-            color: _animateColor.value,
-            size: 35,
-          )),
     );
   }
 }
