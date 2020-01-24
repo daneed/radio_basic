@@ -27,19 +27,6 @@ class Delayer {
   }
 }
 
-class MyApp extends StatelessWidget {
-  static const String _title = 'ABC Radio Light';
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      color: Color(0xFF1B203C),
-      title: _title,
-      home: MyStatefulWidget(),
-    );
-  }
-}
-
 class FloatinActionButtonWidget extends StatefulWidget {
   final Delayer delayer;
   final Color mainColor;
@@ -102,6 +89,19 @@ class _FloatinActionButtonWidgetState extends State<FloatinActionButtonWidget> {
    }
 }
 
+class MyApp extends StatelessWidget {
+  static const String _title = 'ABC Radio Light';
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      color: Color(0xFF1B203C),
+      title: _title,
+      home: MyStatefulWidget(),
+    );
+  }
+}
+
 class MyStatefulWidget extends StatefulWidget {
   final Delayer delayer = Delayer();
   MyStatefulWidget({Key key}) : super(key: key);
@@ -153,7 +153,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   Player player = Player();
   PlaybackState state;
 
-  bool buttonStateIsPlaying;
   Color mainColor = Color(0xFF1B203C);
   PageController _myPage = PageController(initialPage: 0);
 
