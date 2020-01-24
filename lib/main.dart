@@ -122,6 +122,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   void initState() {
     super.initState();
     player.initPlaying();
+    widget.delayer.set();
     _animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500))
           ..addListener(() {
